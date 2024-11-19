@@ -1,6 +1,6 @@
 # CraftConnect
 
-CraftConnect is a MERN stack web application designed to bridge the gap between blue-collar workers and clients seeking skilled labor. This platform allows clients to post job requirements, while workers can browse, apply for, and manage job opportunities based on their expertise. CraftConnect also includes admin functionalities for user and job posting management.
+CraftConnect is an advanced job portal tailored for IT professionals and employers. The platform simplifies the recruitment process by connecting job seekers with potential employers based on skill sets and job requirements. It features three distinct user modules:
 
 ## Features
 
