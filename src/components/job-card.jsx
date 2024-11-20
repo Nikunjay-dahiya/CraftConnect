@@ -18,38 +18,54 @@ import { BarLoader } from "react-spinners";
 const JobCard = ({
   job,
   savedInit = false,
-  onJobAction = () => {},
-  isMyJob = false,
+  onJobAction = () => {}, // Callback to update parent state
+  isMyJob = false, // Determines if the job belongs to the user
 }) => {
-  const [saved, setSaved] = useState(savedInit);
+  const [saved, setSaved] = useState(savedInit); // Tracks if the job is saved
+  const { user } = useUser(); // Get the logged-in user
 
-  const { user } = useUser();
-
+  // Fetch function to delete a job
   const { loading: loadingDeleteJob, fn: fnDeleteJob } = useFetch(deleteJob, {
     job_id: job.id,
   });
 
+  // Fetch function to save or unsave a job
   const {
     loading: loadingSavedJob,
     data: savedJob,
     fn: fnSavedJob,
-  } = useFetch(saveJob);
+  } = useFetch(saveJob, {
+    alreadySaved: saved, // Pass if the job is already saved
+  });
 
+  // Handle saving or unsaving the job
   const handleSaveJob = async () => {
-    await fnSavedJob({
-      user_id: user.id,
-      job_id: job.id,
-    });
-    onJobAction();
+    try {
+      await fnSavedJob({
+        user_id: user.id,
+        job_id: job.id,
+      });
+      onJobAction(); // Trigger callback to update the parent
+    } catch (error) {
+      console.error("Error saving/unsaving job:", error);
+    }
   };
 
+  // Handle deleting the job
   const handleDeleteJob = async () => {
-    await fnDeleteJob();
-    onJobAction();
+    try {
+      await fnDeleteJob();
+      onJobAction(); // Trigger callback to update the parent
+    } catch (error) {
+      console.error("Error deleting job:", error);
+    }
   };
 
+  // Update the `saved` state when the `savedJob` changes
   useEffect(() => {
-    if (savedJob !== undefined) setSaved(savedJob?.length > 0);
+    if (savedJob !== undefined) {
+      setSaved(savedJob?.length > 0);
+    }
   }, [savedJob]);
 
   return (
@@ -72,13 +88,13 @@ const JobCard = ({
       </CardHeader>
       <CardContent className="flex flex-col gap-4 flex-1">
         <div className="flex justify-between">
-          {job.company && <img src={job.company.logo_url} className="h-6" />}
+          {job.company && <img src={job.company.logo_url} alt="Logo" className="h-6" />}
           <div className="flex gap-2 items-center">
             <MapPinIcon size={15} /> {job.location}
           </div>
         </div>
         <hr />
-        {job.description.substring(0, job.description.indexOf("."))}.
+        <p>{job.description.substring(0, job.description.indexOf("."))}.</p>
       </CardContent>
       <CardFooter className="flex gap-2">
         <Link to={`/job/${job.id}`} className="flex-1">
